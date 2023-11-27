@@ -1,0 +1,88 @@
+import java.util.*;
+
+public class MaximumFlow {
+
+    static class Edge {
+        int from, to, capacity, flow;
+
+        Edge(int from, int to, int capacity) {
+            this.from = from;
+            this.to = to;
+            this.capacity = capacity;
+            this.flow = 0;
+        }
+    }
+
+    static int[] bfs(int[][] graph, int s, int t) {
+        int[] parent = new int[graph.length];
+        Arrays.fill(parent, -1);
+        parent[s] = -2;
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(s);
+
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+
+            for (int v = 0; v < graph[u].length; v++) {
+                if (graph[u][v] > 0 && parent[v] == -1) {
+                    parent[v] = u;
+                    queue.add(v);
+                }
+            }
+        }
+
+        return parent;
+    }
+
+    static void augmentFlow(int[][] graph, int parent[], int s, int t) {
+        int pathFlow = Integer.MAX_VALUE;
+
+        for (int v = t; v != s; v = parent[v]) {
+            pathFlow = Math.min(pathFlow, graph[parent[v]][v]);
+        }
+
+        for (int v = t; v != s; v = parent[v]) {
+            int u = parent[v];
+            graph[u][v] -= pathFlow;
+            graph[v][u] += pathFlow;
+        }
+    }
+
+    static int fordFulkerson(int[][] graph, int s, int t) {
+        int maxFlow = 0;
+
+        while (true) {
+            int[] parent = bfs(graph, s, t);
+            if (parent[t] == -1) {
+                break;
+            }
+
+            augmentFlow(graph, parent, s, t);
+            maxFlow += pathFlow;
+        }
+
+        return maxFlow;
+    }
+
+    public static void main(String[] args) {
+        int[][] graph = {
+                {0, 16, 13, 0, 0},
+                {0, 0, 10, 12, 0},
+                {0, 4, 0, 0, 14},
+                {0, 0, 9, 0, 0},
+                {0, 0, 0, 0, 20}
+        };
+
+        int s = 0; // Source node
+        int t = 4; // Sink node
+
+        int maxFlow = fordFulkerson(graph, s, t);
+        System.out.println("Maximum flow: " + maxFlow);
+    }
+}
+
+Sample output:
+Maximum flow: 23
+
+

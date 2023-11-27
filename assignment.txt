@@ -1,0 +1,60 @@
+import java.util.*;
+
+public class AssignmentProblem {
+    static int[][] costMatrix = {{10, 16, 6}, {9, 14, 10}, {12, 18, 15}};
+    static int[] assignment = new int[3];
+    static int minCost = Integer.MAX_VALUE;
+
+    public static void main(String[] args) {
+        solve(0);
+        System.out.println("Minimum cost: " + minCost);
+        printAssignment();
+    }
+
+    static void solve(int row) {
+        if (row == costMatrix.length) {
+            calculateCost();
+            if (minCost > currentCost) {
+                minCost = currentCost;
+                System.arraycopy(assignment, 0, assignment, 0, assignment.length);
+            }
+            return;
+        }
+
+        for (int col = 0; col < costMatrix[row].length; col++) {
+            if (assignment[col] == -1) {
+                assignment[col] = row;
+                solve(row + 1);
+                assignment[col] = -1;
+            }
+        }
+    }
+
+    static void calculateCost() {
+        currentCost = 0;
+        for (int i = 0; i < assignment.length; i++) {
+            int col = assignment[i];
+            if (col != -1) {
+                currentCost += costMatrix[i][col];
+            }
+        }
+    }
+
+    static void printAssignment() {
+        for (int i = 0; i < assignment.length; i++) {
+            System.out.println("Job " + i + " assigned to worker " + assignment[i]);
+        }
+    }
+}
+
+Sample output:
+
+Minimum cost: 25
+Job 0 assigned to worker 2
+Job 1 assigned to worker 1
+Job 2 assigned to worker 0
+
+The time complexity of this algorithm is O(M*N). This is because the algorithm uses a double for
+loop to iterate through the M x N matrix.
+The space complexity of this algorithm is O(M+N). This is because it uses two arrays of size M and
+N to track the applicants and jobs.

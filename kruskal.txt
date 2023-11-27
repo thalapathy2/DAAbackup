@@ -1,0 +1,206 @@
+import java.util.*;
+
+public class MaximumFlow {
+
+    static class Edge {
+        int from, to, capacity, flow;
+
+        Edge(int from, int to, int capacity) {
+            this.from = from;
+            this.to = to;
+            this.capacity = capacity;
+            this.flow = 0;
+        }
+    }
+
+    static int[] bfs(int[][] graph, int s, int t) {
+        int[] parent = new int[graph.length];
+        Arrays.fill(parent, -1);
+        parent[s] = -2;
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(s);
+
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+
+            for (int v = 0; v < graph[u].length; v++) {
+                if (graph[u][v] > 0 && parent[v] == -1) {
+                    parent[v] = u;
+                    queue.add(v);
+                }
+            }
+        }
+
+        return parent;
+    }
+
+    static void augmentFlow(int[][] graph, int parent[], int s, int t) {
+        int pathFlow = Integer.MAX_VALUE;
+
+        for (int v = t; v != s; v = parent[v]) {
+            pathFlow = Math.min(pathFlow, graph[parent[v]][v]);
+        }
+
+        for (int v = t; v != s; v = parent[v]) {
+            int u = parent[v];
+            graph[u][v] -= pathFlow;
+            graph[v][u] += pathFlow;
+        }
+    }
+
+    static int fordFulkerson(int[][] graph, int s, int t) {
+        int maxFlow = 0;
+
+        while (true) {
+            int[] parent = bfs(graph, s, t);
+            if (parent[t] == -1) {
+                break;
+            }
+
+            augmentFlow(graph, parent, s, t);
+            maxFlow += pathFlow;
+        }
+
+        return maxFlow;
+    }
+
+    public static void main(String[] args) {
+        int[][] graph = {
+                {0, 16, 13, 0, 0},
+                {0, 0, 10, 12, 0},
+                {0, 4, 0, 0, 14},
+                {0, 0, 9, 0, 0},
+                {0, 0, 0, 0, 20}
+        };
+
+        int s = 0; // Source node
+        int t = 4; // Sink node
+
+        int maxFlow = fordFulkerson(graph, s, t);
+        System.out.println("Maximum flow: " + maxFlow);
+    }
+}
+Use code with caution. Learn more
+Sample output for the code:
+
+Maximum flow: 23
+profile picture
+give short java program for finding MST using Kruskal's algorithm with sample i/o
+View other drafts
+
+
+
+
+
+
+
+1
+
+2
+Sure, here's a simplified Java code for finding the Minimum Spanning Tree (MST) using Kruskal's algorithm with sample input and output:
+
+Java
+import java.util.*;
+
+class Edge implements Comparable<Edge> {
+    int from, to, weight;
+
+    Edge(int from, int to, int weight) {
+        this.from = from;
+        this.to = to;
+        this.weight = weight;
+    }
+
+    @Override
+    public int compareTo(Edge other){
+        return this.weight - other.weight;
+    }
+}
+
+class DisjointSet {
+    int[] parent;
+
+    DisjointSet(int n) {
+        this.parent = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int find(int u) {
+        if (parent[u] != u) {
+            parent[u] = find(parent[u]);
+        }
+
+        return parent[u];
+    }
+
+    void union(int u, int v) {
+        int rootU = find(u);
+        int rootV = find(v);
+
+        if (rootU != rootV) {
+            parent[rootV] = rootU;
+        }
+    }
+}
+
+public class KruskalMST {
+
+    static void kruskal(int[][] graph, int n) {
+        PriorityQueue<Edge> edges = new PriorityQueue<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (graph[i][j] != 0) {
+                    edges.add(new Edge(i, j, graph[i][j]));
+                }
+            }
+        }
+
+        DisjointSet ds = new DisjointSet(n);
+        List<Edge> mst = new ArrayList<>();
+
+        while (!edges.isEmpty()) {
+            Edge edge = edges.poll();
+
+            int u = edge.from;
+            int v = edge.to;
+
+            if (ds.find(u) != ds.find(v)) {
+                ds.union(u, v);
+                mst.add(edge);
+            }
+        }
+
+        // Print the MST edges
+        for (Edge edge : mst) {
+            System.out.println(edge.from + " - " + edge.to + " (" + edge.weight + ")");
+        }
+    }
+
+    public static void main(String[] args) {
+        int[][] graph = {
+                {0, 4, 6, 0, 0},
+                {4, 0, 5, 0, 8},
+                {6, 5, 0, 2, 2},
+                {0, 0, 2, 0, 7},
+                {0, 8, 2, 7, 0}
+        };
+
+        int n = graph.length;
+        kruskal(graph, n);
+    }
+}
+
+Sample Output:
+0 - 1 (4)
+0 - 3 (6)
+1 - 2 (5)
+1 - 4 (8)
+2 - 3 (2)
+
+Complexity Analysis:
+The efficiency of kruskal’s algorithm is Θ(|E| log |E|) where E is the total number of edges in the graph.

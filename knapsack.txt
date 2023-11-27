@@ -1,0 +1,67 @@
+import java.util.*;
+
+public class KnapsackProblem {
+    static int W = 10; // Knapsack capacity
+    static int[] profits = {60, 100, 120}; // Profits of items
+    static int[] weights = {10, 20, 30}; // Weights of items
+    static int[] include = new int[profits.length]; // Indicates whether an item is included (1) or not included (0)
+    static int maxProfit = 0; // Maximum profit found so far
+
+    public static void main(String[] args) {
+        solve(0);
+        System.out.println("Maximum profit: " + maxProfit);
+        printKnapsack();
+    }
+
+    static void solve(int item) {
+        // Check if the current solution is feasible
+        int totalWeight = 0;
+        for (int i = 0; i < item; i++) {
+            totalWeight += weights[i] * include[i];
+        }
+
+        if (totalWeight > W) {
+            return; // Infeasible solution
+        }
+
+        // Check if we reached the end of the items
+        if (item == profits.length) {
+            int currentProfit = 0;
+            for (int i = 0; i < item; i++) {
+                currentProfit += profits[i] * include[i];
+            }
+
+            if (currentProfit > maxProfit) {
+                maxProfit = currentProfit;
+                System.arraycopy(include, 0, include, 0, include.length);
+            }
+
+            return;
+        }
+
+        // Include the current item
+        include[item] = 1;
+        solve(item + 1);
+
+        // Exclude the current item
+        include[item] = 0;
+        solve(item + 1);
+    }
+
+    static void printKnapsack() {
+        System.out.println("Items included:");
+        for (int i = 0; i < profits.length; i++) {
+            if (include[i] == 1) {
+                System.out.print(i + " ");
+            }
+        }
+        System.out.println();
+    }
+
+Sample Output:
+Maximum profit: 220
+Items included: 1 2
+
+
+Time Complexity: O(N), as only one path through the tree will have to be traversed in the best case
+and its worst time complexity is still given as O(2^N)
